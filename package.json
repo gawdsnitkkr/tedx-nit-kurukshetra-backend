@@ -1,0 +1,20 @@
+{
+  "name": "tedxbackend",
+  "version": "1.0.0",
+  "description": "backend for tedx nit k",
+  "main": "app.js",
+  "scripts": {
+    "test": "node app.js"
+  },
+  "author": "Narendra and Rishabh",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "bootstrap": "^3.3.7",
+    "express": "^4.15.3",
+    "express-session": "^1.15.3",
+    "jquery": "^3.2.1",
+    "mysql": "^2.13.0",
+    "path": "^0.12.7"
+  }
+}
