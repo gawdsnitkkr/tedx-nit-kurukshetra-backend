@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,25 +7,18 @@
 <body>
 <div class="container">
     <div class="container new">
-       
     </div>
-
 </div>
 <script type="text/javascript" src="js/jquery.min.js" ></script>
-
 <script type="text/javascript">
-   
-    var container = $(".new");
+   var container = $(".new");
    $(document).ready(function(){
-        $.post("/blog",{}, function(response){
+       $.post("/blog",{}, function(response){
             for(var i = 0 ; i < response.length ; i++) {
                 container.append(response[i].video_url);
             }
-        });
-    });
-
+       });
+   });
 </script>
-
-
 </body>
 </html>

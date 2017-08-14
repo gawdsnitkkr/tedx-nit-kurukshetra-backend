@@ -10,11 +10,12 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.17.2",
-    "bootstrap": "^3.3.7",
+    "bootstrap": "^4.0.0-beta",
     "express": "^4.15.3",
     "express-session": "^1.15.3",
     "jquery": "^3.2.1",
     "mysql": "^2.13.0",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "multer": "^1.2.0"
   }
 }

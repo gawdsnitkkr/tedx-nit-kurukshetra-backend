@@ -7,6 +7,7 @@ var app = express();
 var server = require('http').Server(app);
 var bodyParser = require('body-parser');
 var session= require('express-session');
+var multer = require('multer');
 var mysql = require('mysql');
 var con = mysql.createConnection({
     host: "localhost",
@@ -19,38 +20,41 @@ con.connect(function (err) {
     console.log("Connected!");
 });
 app.use(express.static(path.join(__dirname, 'www')));
-app.use( bodyParser.json() );
+app.use(bodyParser.json() );
 app.use(bodyParser.urlencoded({ extended: true}));
-app.use(session({secret: 'tom-riddle'}));
-var username;
-app.get('/' , function (req , res) {
-    res.sendFile(__dirname + '/www/index.html');
+app.use(session({
+    secret: 'ted-x-gawds',
+    resave: true,
+    saveUninitialized: true
+}));
+var Storage = multer.diskStorage({
+    destination: function(req, file, callback) {
+        callback(null, "./www/images");
+    },
+    filename: function(req, file, callback) {
+        callback(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
+    }
 });
+var upload = multer({
+    storage: Storage
+}).array("images", 3);
 app.get('/login' , function (req , res) {
-    if(!authenticate(res , res)) {
-        res.sendFile(__dirname + '/www/login.html');
+    if(req.session.user) {
+        res.redirect('/admin');
     }else {
-       res.redirect('/admin');
+        res.sendFile(__dirname + '/www/login.html');
     }
 });
 app.post('/login' , function (req , res) {
-	if(!authenticate(req , res)) {
-		 if(!login(req , res)) {
-		 	res.send({"result": "User NotFound"});
-		 }else {
-		 	// res.send({"result": req.session.user});
-             res.redirect('/admin');
-		 }
-	}else {
-		// res.sendFile(__dirname + '/www/admin/index.html');
-        res.redirect('/admin');
-	}
+    login(req , res);
 });
-app.get('/admin' , function (req , res) {
-    if(!authenticate(req , res)) {
+app.get('/admin'  ,  function (req , res) {
+    console.log(req.session.user);
+    if(!req.session.user) {
+        console.log("Admin");
         res.redirect('/login');
     }else {
-        res.sendFile(__dirname + '/www/admin/index.html');
+        res.sendFile(__dirname + '/www/admin.html');
     }
 });
 app.get('/speaker' , function (req , res) { 
@@ -63,6 +67,22 @@ app.post('/speaker' , function (req , res) {
         var jsonData = JSON.parse(jsonString);
         res.send(jsonData);
     });
+});
+app.post("/speakerinsert", function(req, res) {
+    upload(req ,res, function(err) {
+        if (err) {
+            return res.end("Something went wrong!");
+        }
+        return res.end("File uploaded sucessfully!.");
+    });
+    insertSpeaker(req , res);
+});
+app.get('/logout', function (req, res) {
+    req.session.destroy();
+    res.redirect("/login");
+});
+app.post('/getuser' , function (req , res) {
+    res.send({"username" : req.session.user});
 });
 app.get('/blog' , function (req , res) { 
 	res.sendFile(__dirname + '/www/blog.html');
@@ -77,34 +97,30 @@ app.post('/blog' , function (req , res) {
 });
 function login(req,res){
     var post = req.body;
-    username  = post.user;
+    var username  = post.user;
     var password = post.password;
-    console.log(username);
     var sql = "SELECT * FROM login WHERE username='"+username+"'";
     con.query(sql, function (err, result, fields) {
         var jsonString = JSON.stringify(result);
         var jsonData = JSON.parse(jsonString);
-        if(jsonData[0].password === password) {
-            console.log("User Identified");
+        if( jsonData.length > 0 && jsonData[0].password === password ) {
+            console.log(req.session.user + "Auth set");
             req.session.user = post.user;
-            // username = post.user;
-            return true;
+            res.send({"result" : "Found"});
         }else {
-            console.log("User not Identified");
-            return false;
+            res.send({"result": "NotFound"});
         }
     });
 }
-function authenticate(req,res){
-    console.log("authenticate called");
-    if(req.session.user) {
-        console.log("Auth Found");
-    	// username = req.session.user;
-        return true;
-    } else {
-    	console.log("Auth not Found");
-        return false;
-    }
+function insertSpeaker(req , res ) {
+    var post = req.body;
+    var name  = post.speakername;
+    var topic = post.topic;
+    var description = post.description;
+    var sql = "INSERT INTO speaker(name, topic, description, pic_url) values('"+name+"','"+topic+"','"+description+"','/images/"+post.images+"')";
+    con.query(sql, function (err, result, fields) {
+        console.log(result);
+    });
 }
 // Starting Server
 server.listen(3000, function(){
