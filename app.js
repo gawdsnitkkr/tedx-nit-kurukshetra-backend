@@ -9,6 +9,8 @@ var bodyParser = require('body-parser');
 var session= require('express-session');
 var multer = require('multer');
 var mysql = require('mysql');
+var sanitizeHtml = require('sanitize-html');
+var multiparty = require('multiparty');
 var con = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -21,7 +23,7 @@ con.connect(function (err) {
 });
 app.use(express.static(path.join(__dirname, 'www')));
 app.use(bodyParser.json() );
-app.use(bodyParser.urlencoded({ extended: true}));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(session({
     secret: 'ted-x-gawds',
     resave: true,
@@ -32,7 +34,7 @@ var Storage = multer.diskStorage({
         callback(null, "./www/images");
     },
     filename: function(req, file, callback) {
-        callback(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
+        callback(null,  sanitizeHtml(req.body.speakername)+".jpg");
     }
 });
 var upload = multer({
@@ -73,9 +75,8 @@ app.post("/speakerinsert", function(req, res) {
         if (err) {
             return res.end("Something went wrong!");
         }
-        return res.end("File uploaded sucessfully!.");
+        insertSpeaker(req , res);
     });
-    insertSpeaker(req , res);
 });
 app.get('/logout', function (req, res) {
     req.session.destroy();
@@ -95,10 +96,15 @@ app.post('/blog' , function (req , res) {
         res.send(jsonData);
     });
 });
+app.post("/videoinsert", function(req, res) {
+    insertVideo(req , res);
+});
 function login(req,res){
     var post = req.body;
     var username  = post.user;
     var password = post.password;
+    username = sanitizeHtml(username);
+    password = sanitizeHtml(password);
     var sql = "SELECT * FROM login WHERE username='"+username+"'";
     con.query(sql, function (err, result, fields) {
         var jsonString = JSON.stringify(result);
@@ -117,13 +123,28 @@ function insertSpeaker(req , res ) {
     var name  = post.speakername;
     var topic = post.topic;
     var description = post.description;
-    var sql = "INSERT INTO speaker(name, topic, description, pic_url) values('"+name+"','"+topic+"','"+description+"','/images/"+post.images+"')";
+    name = sanitizeHtml(name);
+    topic = sanitizeHtml(topic);
+    description = sanitizeHtml(description);
+    var sql = "INSERT INTO speaker(name, topic, description, pic_url) values('"+name+"','"+topic+"','"+description+"','/images/"+name+".jpg')";
     con.query(sql, function (err, result, fields) {
-        console.log(result);
+        res.redirect('/admin');
+    });
+}
+function insertVideo(req , res ) {
+    var post = req.body;
+    var title  = post.title;
+    var description = post.description;
+    var url = post.url;
+    title = sanitizeHtml(title);
+    description = sanitizeHtml(description);
+    var sql = "INSERT INTO videos(title, description, video_url) values('"+title+"','"+description+"','"+url+"')";
+    con.query(sql, function (err, result, fields) {
+        res.redirect('/admin');
     });
 }
 // Starting Server
-server.listen(3000, function(){
+const port = process.env.PORT || 3000;
+server.listen(port, function(){
     console.log('listening on *:3000');
 });
-

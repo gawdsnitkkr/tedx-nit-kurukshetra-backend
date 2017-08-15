@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Pannel</title>
+    <title>Admin Panel</title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/main.css">
 </head>
@@ -27,7 +27,7 @@
                 </ul>
                 <div class="tab-content">
                     <div id="menu1" class="tab-pane fade in active" >
-                        <form class="form-inline" action="/speakerinsert" method="post" >
+                        <form class="form-inline" action="/speakerinsert" method="post" enctype="multipart/form-data" >
                             <div class="form-group">
                                 <input type="text" name="speakername" placeholder="Name" class="form-control fields" id="name">
                             </div><br><br>
@@ -37,7 +37,7 @@
                             <div class="form-group">
                                 <textarea type="text" name="description" placeholder="Description" class="form-control fields" id="description"></textarea>
                             </div><br><br>
-                                <input type="file" placeholder="File" name="images" multiple  id="file">
+                            <input type="file" placeholder="File" name="images" multiple  id="file">
                             <br>
                             <button type="submit" class="btn btn-default">Submit</button>
                         </form>
