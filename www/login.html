@@ -26,7 +26,10 @@
     var error = $("#error");
     $(".btn").click(function(){
         console.log(pass.val());
-        var data = {"user": ""+user.val()+"" , "password":""+ pass.val()+""};
+        var data = {
+            "user": user.val(),
+            "password": pass.val()
+        };
         $.post("/login",data, function(status){
             if(status.result === "NotFound") {
                 error.html("Username or password not match");
@@ -38,3 +41,4 @@
 </script>
 </body>
 </html>
+

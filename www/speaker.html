@@ -15,7 +15,7 @@
 <script type="text/javascript">
    var container = $(".new");
    $(document).ready(function(){
-       $.post("/speaker",{}, function(response){
+       $.post("/speakers",{}, function(response){
             for(var i = 0 ; i < response.length ; i++) {
                 container.append('<ul class="list-group " > <li class="list-group-item"> ' +response[i].name+ '</li>  <li class="list-group-item"> ' +response[i].topic+ '</li><li class="list-group-item">'+response[i].description+ '</li><li class="list-group-item">'+response[i].pic_url+ '</li></ul>');
             }
@@ -24,3 +24,4 @@
 </script>s
 </body>
 </html>
+
