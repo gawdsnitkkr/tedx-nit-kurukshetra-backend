@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1,width=device-width">
+    <meta name="description" content="TEDx National Institute of Technology, Kurukshetra ."/>
+    <link rel="author" href="http://gawds.in"/>
+    <meta name="author" content="gawds"/>
+    <meta name="robots" content="index, follow"/>
+    <meta property="og:title" content="TEDx NIT Kurukshetra"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:image" itemprop="image" content="/jpg/Logo.jpg"/>
+    <meta property="og:url" content="http://tednitkkr.in"/>
+    <meta property="og:description" content="TEDx National Institute of Technology, Kurukshetra ."/>
+
+    <meta name="twitter:card" content="summary"/>
+    <meta name="twitter:url"  content="http://tednitkkr.in"/>
+    <meta name="twitter:title" content="TEDx NIT Kurukshetra"/>
+    <meta name="twitter:description" content="TEDx National Institute of Technology, Kurukshetra ."/>
+    <meta name="twitter:image" content="jpg/Logo.jpg"/>
+
+    <meta itemprop="name" content="Techspardha 2017">
+    <meta itemprop="description" content="TEDx National Institute of Technology, Kurukshetra .">
+    <meta itemprop="image" content="jpg/Logo.jpg">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+<nav class="navbar navbar-default header-admin">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <p class="navbar-brand user">username</p>
+        </div>
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/logout">Logout</a>
+        </div>
+    </div>
+</nav>
+<div class="container admin-body">
+    <div class="jumbotron" >
+        <div class="row about-tedx">
+            <div class="container">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a data-toggle="tab" href="#menu1">Speaker</a></li>
+                    <li><a data-toggle="tab" href="#menu2">Video</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div id="menu1" class="tab-pane fade in active" >
+                        <form class="form-inline" action="/speaker-insert" method="post" enctype="multipart/form-data" >
+                            <div class="form-group">
+                                <input type="text" name="speakername" placeholder="Name" class="form-control fields" id="name">
+                            </div>
+                            <br>
+                            <div class="form-group">
+                                <input type="text" name="topic" placeholder="Topic" class="form-control fields" id="topic">
+                            </div>
+                            <br>
+                            <div class="form-group">
+                                <textarea type="text" name="description" placeholder="Description" class="form-control fields" id="description"></textarea>
+                            </div>
+                            <br>
+                            <input type="file" placeholder="File" name="images" multiple  id="file">
+                            <br>
+                            <button type="submit" class="btn btn-default">Submit</button>
+                        </form>
+                        <hr/>
+                        <ul class="list-group" id="speakers">
+                        </ul>
+                    </div>
+                    <div id="menu2" class="tab-pane fade">
+                        <form class="form-inline" action="/video-insert" method="post" >
+                            <div class="form-group">
+                                <input type="text" name="title" placeholder="Title"class="form-control fields"id="title">
+                            </div><br><br>
+                            <div class="form-group">
+                                <textarea type="text" name="description" placeholder="Description" class="form-control fields" id="desc" ></textarea>
+                            </div><br><br>
+                            <div class="form-group">
+                                <input type="text" name="url" placeholder="URL" class="form-control fields" id="url">
+                            </div><br><br>
+                            <button type="submit" class="btn btn-default">Submit</button>
+                        </form>
+                        <hr>
+                        <ul class="list-group" id="videos"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="js/jquery.min.js" ></script>
+<script src="js/bootstrap.min.js"></script>
+<script type="text/javascript">
+    var username = $(".user");
+    var speakers = $("#speakers");
+    var videos = $("#videos");
+    $(document).ready(function(){
+        $.post("/getuser",{}, function(response){
+            username.text(response.username);
+        });
+        $.post("/speakers",{}, function(response){
+            for(var i = 0 ; i < response.length ; i++) {
+                speakers.append('<ul class="list-group " >' +
+                        ' <li class="list-group-item"> ' +
+                            '' +response[i].name+ '(' +response[i].topic+ ')' +
+                            '<button class=" btn delete deleteSpeaker "  name="'+response[i].name+'" > Delete </button>' +
+                        '</li>' +
+                    '</ul>');
+                $(".deleteSpeaker" ).click(function() {
+                    var data =  {
+                      "speakerName" : this.name
+                    };
+                    $.post("/delete-speaker" , data ,function(response){
+                        location.reload();
+                    });
+                });
+            }
+        });
+        $.post("/blog",{}, function(response){
+            for(var i = 0 ; i < response.length ; i++) {
+                videos.append('<ul class="list-group " > ' +
+                        '<li class="list-group-item">' +
+                            ' '+response[i].title+
+                            '<button class="btn deleteVideos delete btn-group" name="'+response[i].title+'" > Delete </button>' +
+                        '</li>' +
+                    '</ul>');
+                $(".deleteVideos" ).click(function() {
+                    var data =  {
+                        "videoTitle" : this.name
+                    };
+                    $.post("/delete-video" , data ,function(response){
+                        location.reload();
+                    });
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>
+
